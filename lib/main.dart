@@ -5,14 +5,14 @@ class User {
   String lastName;
   String phone;
   String email;
-  String description;
+  String bio;
 
   User({
     required this.firstName,
     required this.lastName,
     required this.phone,
     required this.email,
-    required this.description,
+    required this.bio,
   });
 }
 
@@ -29,218 +29,80 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
 
-class _HomeScreenState extends State<HomeScreen> {
-  // Assuming you have a User class
   User user = User(
-    firstName: 'John',
-    lastName: 'Doe',
-    phone: '123-456-7890',
-    email: 'john.doe@example.com',
-    description: 'Flutter Developer',
+    firstName: 'Micah',
+    lastName: 'Smith',
+    phone: '208-206-5039',
+    email: 'micahsmith@gmail.com',
+    bio:
+        'Hi my name is Mica Smith. I am from Mesa but go to school in Salt Lake City. I make this drive all the time and have plenty',
   );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Profile'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Avatar
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/avatar_placeholder.jpg'),
-            ),
-            SizedBox(height: 20),
-            // Editable TextFields
-            EditableField(
-              user: user,
-              field: 'Full Name',
-              onUpdate: (newValue) {
-                setState(() {
-                  user = newValue;
-                });
-              },
-            ),
-            EditableField(
-              user: user,
-              field: 'Phone',
-              onUpdate: (newValue) {
-                setState(() {
-                  user = newValue;
-                });
-              },
-            ),
-            EditableField(
-              user: user,
-              field: 'Email',
-              onUpdate: (newValue) {
-                setState(() {
-                  user = newValue;
-                });
-              },
-            ),
-            EditableField(
-              user: user,
-              field: 'Description',
-              onUpdate: (newValue) {
-                setState(() {
-                  user = newValue;
-                });
-              },
-            ),
-          ],
+        appBar: AppBar(
+          title: Text('Edit Profile'),
         ),
-      ),
-    );
-  }
-}
-
-class EditableField extends StatelessWidget {
-  final User user;
-  final String field;
-  final Function(User) onUpdate;
-
-  EditableField(
-      {required this.user, required this.field, required this.onUpdate});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        // Navigate to the respective editing page
-        User updatedUser = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EditFieldPage(user: user, field: field),
+        body: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: ListView(
+            children: ListTile.divideTiles(context: context, tiles: [
+              ListTile(
+                trailing: Icon(Icons.arrow_forward_ios_rounded),
+                contentPadding: EdgeInsets.zero,
+                title: ProfileField(
+                    field: "Name",
+                    fieldValue: "${user.firstName} ${user.lastName}"),
+              ),
+              ListTile(
+                trailing: Icon(Icons.arrow_forward_ios_rounded),
+                contentPadding: EdgeInsets.zero,
+                title: ProfileField(field: "Phone", fieldValue: user.phone),
+              ),
+              ListTile(
+                trailing: Icon(Icons.arrow_forward_ios_rounded),
+                contentPadding: EdgeInsets.zero,
+                title: ProfileField(field: "Email", fieldValue: user.email),
+              ),
+              ListTile(
+                trailing: Icon(Icons.arrow_forward_ios_rounded),
+                contentPadding: EdgeInsets.zero,
+                title: ProfileField(field: "Bio", fieldValue: user.bio),
+              ),
+            ]).toList(),
           ),
-        );
-
-        if (updatedUser != null) {
-          onUpdate(updatedUser);
-        }
-      },
-      child: Container(
-        padding: EdgeInsets.all(10),
-        child: Text(
-          _getFieldValue(), // <-- Call the method here
-          style: TextStyle(fontSize: 18),
-        ),
-      ),
-    );
-  }
-
-  String _getFieldValue() {
-    switch (field) {
-      case 'Full Name':
-        return '${user.firstName} ${user.lastName}';
-      case 'Phone':
-        return user.phone;
-      case 'Email':
-        return user.email;
-      case 'Description':
-        return user.description;
-      default:
-        return '';
-    }
+        ));
   }
 }
 
-class EditFieldPage extends StatefulWidget {
-  final User user;
+class ProfileField extends StatelessWidget {
+  const ProfileField(
+      {super.key, required this.field, required this.fieldValue});
+
   final String field;
-
-  EditFieldPage({required this.user, required this.field});
-
-  @override
-  _EditFieldPageState createState() => _EditFieldPageState();
-}
-
-class _EditFieldPageState extends State<EditFieldPage> {
-  late TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: _getFieldValue());
-  }
+  final String fieldValue;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit ${widget.field}'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextFormField(
-              controller: _controller,
-              decoration: InputDecoration(labelText: widget.field),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Field cannot be empty';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                _updateUser();
-                Navigator.pop(context, widget.user);
-              },
-              child: Text('Update'),
-            ),
-          ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          field,
+          style: Theme.of(
+            context,
+          ).textTheme.labelMedium,
         ),
-      ),
+        Text(fieldValue,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium),
+      ],
     );
-  }
-
-  void _updateUser() {
-    String newValue = _controller.text;
-
-    switch (widget.field) {
-      case 'Full Name':
-        List<String> names = newValue.split(' ');
-        widget.user.firstName = names.first;
-        widget.user.lastName = names.length > 1 ? names.last : '';
-        break;
-      case 'Phone':
-        widget.user.phone = newValue;
-        break;
-      case 'Email':
-        widget.user.email = newValue;
-        break;
-      case 'Description':
-        widget.user.description = newValue;
-        break;
-    }
-  }
-
-  String _getFieldValue() {
-    switch (widget.field) {
-      case 'Full Name':
-        return '${widget.user.firstName} ${widget.user.lastName}';
-      case 'Phone':
-        return widget.user.phone;
-      case 'Email':
-        return widget.user.email;
-      case 'Description':
-        return widget.user.description;
-      default:
-        return '';
-    }
   }
 }
