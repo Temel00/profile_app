@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class User {
+class User extends ChangeNotifier {
   String firstName;
   String lastName;
   String phone;
@@ -14,6 +14,26 @@ class User {
     required this.email,
     required this.bio,
   });
+
+  void setFirstName(String fname) {
+    firstName = fname;
+  }
+
+  void setLastName(String lname) {
+    lastName = lname;
+  }
+
+  void setPhone(String phone) {
+    this.phone = phone;
+  }
+
+  void setEmail(String email) {
+    this.email = email;
+  }
+
+  void setBio(String bio) {
+    this.bio = bio;
+  }
 }
 
 void main() {
@@ -25,23 +45,52 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: HomeScreen(),
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
-  User user = User(
-    firstName: 'Micah',
-    lastName: 'Smith',
-    phone: '208-206-5039',
-    email: 'micahsmith@gmail.com',
-    bio:
-        'Hi my name is Mica Smith. I am from Mesa but go to school in Salt Lake City. I make this drive all the time and have plenty',
-  );
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late User user;
+
+  @override
+  void initState() {
+    super.initState();
+    user = User(
+      firstName: 'Micah',
+      lastName: 'Smith',
+      phone: '208-206-5039',
+      email: 'micahsmith@gmail.com',
+      bio:
+          'Hi my name is Mica Smith. I am from Mesa but go to school in Salt Lake City. I make this drive all the time and have plenty',
+    );
+  }
+
+  void updateUser(String updateVal1, String updateVal2, String field) {
+    setState(() {
+      if (field == "name") {
+        user.firstName = updateVal1;
+        user.lastName = updateVal2;
+      }
+      if (field == "phone") {
+        user.phone = updateVal1;
+      }
+      if (field == "email") {
+        user.email = updateVal1;
+      }
+      if (field == "bio") {
+        user.bio = updateVal1;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +112,9 @@ class HomeScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(4),
               child: ClipOval(
-                  child: Image.network('https://i.pravatar.cc/150?img=11')),
+                  child: CircleAvatar(
+                backgroundColor: Colors.deepOrange[100],
+              )),
             ),
           ),
           Positioned(
@@ -83,81 +134,91 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: ListView(
-          shrinkWrap: true,
-          children: ListTile.divideTiles(context: context, tiles: [
-            ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfileFieldPage(
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: ListView(
+            shrinkWrap: true,
+            children: ListTile.divideTiles(context: context, tiles: [
+              ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileFieldPage(
                         initialValue1: user.firstName,
                         initialValue2: user.lastName,
-                        field: "name"),
-                  ),
-                );
-              },
-              trailing: const Icon(Icons.arrow_forward_ios_rounded),
-              contentPadding: EdgeInsets.zero,
-              title: ProfileField(
-                  fieldLabel: "Name",
-                  fieldValue: "${user.firstName} ${user.lastName}"),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfileFieldPage(
-                      initialValue1: user.phone,
-                      initialValue2: '',
-                      field: "phone",
+                        field: "name",
+                        updateUserCallback: updateUser,
+                      ),
                     ),
-                  ),
-                );
-              },
-              trailing: const Icon(Icons.arrow_forward_ios_rounded),
-              contentPadding: EdgeInsets.zero,
-              title: ProfileField(fieldLabel: "Phone", fieldValue: user.phone),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfileFieldPage(
+                  );
+                },
+                trailing: const Icon(Icons.arrow_forward_ios_rounded),
+                contentPadding: EdgeInsets.zero,
+                title: ProfileField(
+                    fieldLabel: "Name",
+                    fieldValue: "${user.firstName} ${user.lastName}"),
+              ),
+              ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileFieldPage(
+                        initialValue1: user.phone,
+                        initialValue2: '',
+                        field: "phone",
+                        updateUserCallback: updateUser,
+                      ),
+                    ),
+                  );
+                },
+                trailing: const Icon(Icons.arrow_forward_ios_rounded),
+                contentPadding: EdgeInsets.zero,
+                title:
+                    ProfileField(fieldLabel: "Phone", fieldValue: user.phone),
+              ),
+              ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileFieldPage(
                         initialValue1: user.email,
                         initialValue2: '',
-                        field: "email"),
-                  ),
-                );
-              },
-              trailing: const Icon(Icons.arrow_forward_ios_rounded),
-              contentPadding: EdgeInsets.zero,
-              title: ProfileField(fieldLabel: "Email", fieldValue: user.email),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfileFieldPage(
-                      initialValue1: user.bio,
-                      initialValue2: '',
-                      field: "bio",
+                        field: "email",
+                        updateUserCallback: updateUser,
+                      ),
                     ),
-                  ),
-                );
-              },
-              trailing: const Icon(Icons.arrow_forward_ios_rounded),
-              contentPadding: EdgeInsets.zero,
-              title: ProfileField(
-                  fieldLabel: "Tell us about yourself", fieldValue: user.bio),
-            ),
-          ]).toList(),
+                  );
+                },
+                trailing: const Icon(Icons.arrow_forward_ios_rounded),
+                contentPadding: EdgeInsets.zero,
+                title:
+                    ProfileField(fieldLabel: "Email", fieldValue: user.email),
+              ),
+              ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileFieldPage(
+                        initialValue1: user.bio,
+                        initialValue2: '',
+                        field: "bio",
+                        updateUserCallback: updateUser,
+                      ),
+                    ),
+                  );
+                },
+                trailing: const Icon(Icons.arrow_forward_ios_rounded),
+                contentPadding: EdgeInsets.zero,
+                title: ProfileField(
+                    fieldLabel: "Tell us about yourself", fieldValue: user.bio),
+              ),
+            ]).toList(),
+          ),
         ),
       ),
     ]));
@@ -192,14 +253,19 @@ class ProfileField extends StatelessWidget {
   }
 }
 
+typedef UpdateUserCallback = void Function(
+    String val1, String val2, String field);
+
 class ProfileFieldPage extends StatefulWidget {
+  final String initialValue1, initialValue2, field;
+  final UpdateUserCallback updateUserCallback;
+
   const ProfileFieldPage(
       {super.key,
       required this.initialValue1,
       required this.initialValue2,
-      required this.field});
-
-  final String initialValue1, initialValue2, field;
+      required this.field,
+      required this.updateUserCallback});
 
   @override
   State<ProfileFieldPage> createState() => _ProfileFieldPageState();
@@ -359,8 +425,10 @@ class _ProfileFieldPageState extends State<ProfileFieldPage> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {
+                        widget.updateUserCallback(
+                            _controller1.text, _controller2.text, widget.field);
                         // Validate successful, pass the updated value back
-                        Navigator.pop(context, _controller1.text);
+                        Navigator.pop(context);
                       }
                     },
                     child: const Text('Update'),
