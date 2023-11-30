@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:profile_app/main.dart';
+import 'package:profile_app/profile_field_page.dart';
 
 Widget createHomeScreen() => ChangeNotifierProvider<User>(
       create: (context) => User(
-        firstName: 'Micah',
-        lastName: 'Smith',
-        phone: '208-206-5039',
-        email: 'micahsmith@gmail.com',
-        bio:
-            'Hi my name is Mica Smith. I am from Mesa but go to school in Salt Lake City. I make this drive all the time and have plenty',
-      ),
+          firstName: 'Micah',
+          lastName: 'Smith',
+          phone: '208-206-5039',
+          email: 'micahsmith@gmail.com',
+          bio:
+              'Hi my name is Mica Smith. I am from Mesa but go to school in Salt Lake City. I make this drive all the time and have plenty',
+          image:
+              'https://firebasestorage.googleapis.com/v0/b/profile-demo-53d30.appspot.com/o/headshot_ph.jpg?alt=media&token=3c1658a9-8378-471f-87a4-9f0d8f4fb8fe'),
       child: const MaterialApp(
         home: HomeScreen(),
       ),
