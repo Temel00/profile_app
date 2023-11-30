@@ -26,12 +26,18 @@ dependencies:
     sdk: flutter
   provider: ^6.1.1
   google_fonts: ^6.1.0
+  firebase_core: ^2.24.0
+  image_picker: ^1.0.4
+  firebase_storage: ^11.5.3
+  http: ^1.1.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
   test: ^1.24.9
+  mockito: ^5.4.3
+  build_runner: ^2.4.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

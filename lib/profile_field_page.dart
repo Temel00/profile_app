@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 // The Profile Field Page conditionally renders the appropriate fields and allows the user to input and update their profile information
 
@@ -33,7 +37,7 @@ class _ProfileFieldPageState extends State<ProfileFieldPage> {
     _controller1 = TextEditingController(text: widget.initialValue1);
     _controller2 = TextEditingController(text: widget.initialValue2);
     _formKey = GlobalKey<FormState>();
-    _imageUrl = "";
+    _imageUrl = widget.initialValue1;
   }
 
   @override
@@ -221,11 +225,48 @@ class _ProfileFieldPageState extends State<ProfileFieldPage> {
                         child: SizedBox(
                             width: 300,
                             height: 200,
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  debugPrint("Image clicked");
-                                },
-                                child: const Text("Test Image"))),
+                            child: InkWell(
+                              onTap: () async {
+                                // Create the ImagePicker and set the source to gallery
+                                ImagePicker imagePicker = ImagePicker();
+                                XFile? file = await imagePicker.pickImage(
+                                    source: ImageSource.gallery);
+
+                                // Create unique filename
+                                String uniqueName = DateTime.now()
+                                    .millisecondsSinceEpoch
+                                    .toString();
+
+                                // Access My Firebase application and create a storeage ref
+                                Reference referenceRoot =
+                                    FirebaseStorage.instance.ref();
+
+                                // Create a reference to an images directory in my Storage
+                                Reference referenceDirImages =
+                                    referenceRoot.child('images');
+
+                                // Create reference for image to upload
+                                Reference referenceImageToUpload =
+                                    referenceDirImages.child(uniqueName);
+
+                                // Attempt to store the image the user selects to firebase storage
+                                try {
+                                  // Store the file to firebase
+                                  await referenceImageToUpload
+                                      .putFile(File(file!.path));
+
+                                  _imageUrl = await referenceImageToUpload
+                                      .getDownloadURL();
+                                } catch (error) {
+                                  // An error occured
+                                  debugPrint(
+                                      "An error occurred while trying to upload the image to firebase");
+                                }
+                              },
+                              child: Image.network(
+                                widget.initialValue1,
+                              ),
+                            )),
                       ),
                     const SizedBox(width: 20),
                     // Conditionally render the Last Name Form Field with TextController2 controlling updating
@@ -282,11 +323,17 @@ class _ProfileFieldPageState extends State<ProfileFieldPage> {
                         foregroundColor: Colors.white,
                       ),
                       onPressed: () {
-                        if (_formKey.currentState?.validate() ?? false) {
-                          widget.updateUserCallback(_controller1.text,
-                              _controller2.text, widget.field);
-                          // Validate successful, pass the updated value back
+                        if (widget.field == "image") {
+                          widget.updateUserCallback(
+                              _imageUrl, _controller2.text, widget.field);
                           Navigator.pop(context);
+                        } else {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            widget.updateUserCallback(_controller1.text,
+                                _controller2.text, widget.field);
+                            // Validate successful, pass the updated value back
+                            Navigator.pop(context);
+                          }
                         }
                       },
                       child: const Text('Update'),

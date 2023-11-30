@@ -1,5 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:profile_app/firebase_options.dart';
+import 'package:profile_app/profile_avatar.dart';
 import 'package:profile_app/profile_field.dart';
 import 'package:profile_app/profile_field_page.dart';
 
@@ -22,12 +25,17 @@ class User extends ChangeNotifier {
   });
 }
 
-void main() {
-  runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   final MaterialColor primaryColor =
       const MaterialColor(0xff4169e1, <int, Color>{
@@ -152,52 +160,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ).textTheme.displayMedium,
       ),
       const SizedBox(height: 20),
-      // Home Screen Content (Avatar and ListTiles)
-      Stack(
-        children: [
-          // Circular Profile Image with Border
-          CircleAvatar(
-            radius: 60,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            child: const Padding(
-              padding: EdgeInsets.all(4),
-              child: ClipOval(
-                  child: CircleAvatar(
-                radius: 55,
-                // backgroundImage: NetworkImage(user.image),
-                backgroundColor: Colors.deepOrange,
-              )),
-            ),
-          ),
-          // Edit Icon Button
-          Positioned(
-            top: 1,
-            right: 1,
-            child: ElevatedButton(
-                // When Edit button is pressed, navigate to the 'image' ProfilePagField passing user.image
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfileFieldPage(
-                        initialValue1: user.image,
-                        initialValue2: '',
-                        field: "image",
-                        updateUserCallback: updateUser,
-                      ),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(10),
-                  backgroundColor: Colors.white,
-                ),
-                child: Icon(Icons.edit,
-                    color: Theme.of(context).colorScheme.primary)),
-          ),
-        ],
-      ),
+      // Circular Profile Image with Edit Icon
+      ProfileAvatar(imageURL: user.image),
       // List View with Name, Phone, Email, and Bio Tiles
       Expanded(
         child: Padding(
